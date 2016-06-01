@@ -5,8 +5,9 @@ require 'sinatra/json'
 require 'sinatra/namespace'
 
 #
-# TODO: Set up redis access + bootstrap all the things
+# Application-specific libraries/classes
 #
+require_relative 'lib/key'
 
 #
 # DummyRedisApp
@@ -16,29 +17,26 @@ require 'sinatra/namespace'
 #
 
 class DummyRedisApp < Sinatra::Base
-  #
-  # Set up things from sinatra-contrib like namespaces,
-  # special param stuff, json, etc.
-  #
   register Sinatra::Namespace
 
   namespace '/api' do
     namespace '/v1' do
 
       get '/keys/:key' do
-        # TODO: Look up key in redis, return its value in JSON
-        json :todo => 'NYI (not yet implemented)'
+        if @key = Key.find(params['key'])
+          json (@key.name.to_sym) => @key.value
+        else
+          json (params['key'].to_sym) => {status: 'not found'}
+        end
       end
 
-      post '/keys' do
-        # TODO: Create new object, save in redis
-        json :obj => 'NYI (not yet implemented)'
-      end
-
-      put '/keys/:key' do
-        # TODO: If key exists, make its value equal to post data
-        # TODO: If key does not exist, respond 404
-        json :obj => 'NYI (not yet implemented)'
+      post '/keys/:name' do
+        @key = Key.new(params['name'], params['value'])
+        if @key.save
+          json (@key.name.to_sym) => @key.value
+        else
+          json params['name'] => {:status => 'save failed'}
+        end
       end
 
     end # /namespace v1

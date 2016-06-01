@@ -27,6 +27,26 @@ Where:
 | `<PORT>` | Numeric port where redis is bound on that host | `31337` |
 | `<DB_NUMBER>` | Numeric DB number (pseudo-namespace) to use | `15` |
 
+## Setting a key
+
+> You can use this same request and method to overwrite the value of a known key as well.
+
+```
+curl -X POST -d 'value={"object":"someval"}' http://localhost:9292/api/v1/keys/wtfbbq
+```
+
+Send an HTTP POST to `/api/v1/keys/NEWKEYNAME` where you specify one POST data field named "value" and its contents contain the string you want set in redis at that key's name. *It's strongly recommended you encode this as valid JSON with UTF-8 before sending it up there.*
+
+## Getting a key
+
+```
+curl -i http://localhost:9292/api/v1/keys/wtfbbq
+```
+
+Issue a GET request over HTTP for the name of the key itself. The returned data will be a string of whatever was put in that key space to begin with.
+
+
+
 > What's the default redis port?
 
 `6379`
@@ -47,12 +67,12 @@ Er, uhh, *Ahem*. Yes, the DB_NUMBER. Failure to specify this parameter (an integ
 
 > What about user/password?
 
-Even though a simple authentication feature is supported with newer versions of Redis, this application **does not** support it or utilize it explicitly. 
+Even though a simple authentication feature is supported with newer versions of Redis, this application **does not** support it or utilize it explicitly.
 
 > What's a sane default here?
 
 ```
-redis://localhost:6379/1
+redis://localhost:6379/0
 ```
 
 > What about master/replica or redis cluster setups?
